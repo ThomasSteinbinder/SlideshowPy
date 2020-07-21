@@ -5,10 +5,16 @@
 # Released under GNU Public License (GPL)
 # -----------------------------------------------------------
 
+import sys
+import getopt
 import glob
 from os.path import join
 import cv2
 import numpy as np
+
+screen_width = 640
+screen_height = 480
+
 
 # Resizes an image to fit in the screen resolution
 def resize_image(img):
@@ -23,6 +29,7 @@ def resize_image(img):
                          fy=resize_factor)                         
     return new_img
 
+
 # Generates an image of the size of the screen
 # and places a given image centered inside it.
 def frame_image(img):
@@ -34,52 +41,75 @@ def frame_image(img):
     return new_img
 
 
-#image_path = "C:\\Users\\Thomas\\Desktop\\photoframe\\"
-image_dir = "D:\\testImg\\2\\"
-images = []
-for ext in ('*.jpg', '*.jpeg', '*.bmp', '*.png'):
-    images.extend(glob.glob(join(image_dir, ext)))   
-count = len(images)
-
-if count == 0:
-    exit();
-
-cv2.namedWindow('window', cv2.WINDOW_NORMAL)
-cv2.setWindowProperty('window',
-                       cv2.WND_PROP_FULLSCREEN,
-                       cv2.WINDOW_FULLSCREEN)
-x, y, screen_width, screen_height = cv2.getWindowImageRect('window')
-i = 1;
-display_time = 2000
-fade_time = 3000
-fade_steps = int(fade_time / 100)
-time_per_fade_step = int(fade_time / fade_steps)
-
-image1 = cv2.imread(images[0])
-image1 = resize_image(image1)
-image1 = frame_image(image1)
-cv2.imshow("window", image1)
-
-while True:
-    if i == count:
-        i = 0        
-    image2 = cv2.imread(images[i])
-    image2 = resize_image(image2)
-    image2 = frame_image(image2)
-    blend_img = image1
+def main(argv):
+    image_dir = ".\\"
+    display_time = 2000
     
-    cv2.waitKey(display_time)
+    try:
+        opts, args = getopt.getopt(argv,"d:w:h:t:h")
+    except getopt.GetoptError:
+        print("slideshow.py -d <directory> -w <width> -h <height> -t <time>")
+        sys.exit(2)
+    if len(opts) == 0:
+        print("slideshow.py -d <directory> -w <width> -h <height> -t <time>")
+    for opt, arg in opts:
+        if opt in ("-d"):
+            image_dir = arg
+        if opt in ("-w"):
+            global screen_width
+            screen_width = int(arg)
+        if opt in ("-h"):
+            global screen_height
+            screen_height = int(arg)
+        if opt in ("-t"):
+            display_time = int(arg)
     
-    # Blending images
-    for a in range(fade_steps - 1, 0, -1):
-        alpha = a / fade_steps
-        beta = ( 1.0 - alpha )     
-        cv2.addWeighted(image1, alpha,
-                        image2, beta,
-                        0.0, blend_img)
-        cv2.imshow("window", blend_img)
-        cv2.waitKey(time_per_fade_step)
-        
-    image1 = image2
+    images = []
+    for ext in ('*.jpg', '*.jpeg', '*.bmp', '*.png'):
+        images.extend(glob.glob(join(image_dir, ext)))   
+    count = len(images)    
+    if count == 0:
+        print("No images found in directory: ",image_dir)
+        exit();
+    
+    cv2.namedWindow('window', cv2.WINDOW_NORMAL)
+    cv2.setWindowProperty('window',
+                        cv2.WND_PROP_FULLSCREEN,
+                        cv2.WINDOW_FULLSCREEN)    
+    i = 1;
+    fade_time = 3000
+    fade_steps = int(fade_time / 100)
+    time_per_fade_step = int(fade_time / fade_steps)
+    
+    image1 = cv2.imread(images[0])
+    image1 = resize_image(image1)
+    image1 = frame_image(image1)
     cv2.imshow("window", image1)
-    i += 1
+    
+    while True:
+        if i == count:
+            i = 0        
+        image2 = cv2.imread(images[i])
+        image2 = resize_image(image2)
+        image2 = frame_image(image2)
+        blend_img = image1
+        
+        cv2.waitKey(display_time)
+        
+        # Blending images
+        for a in range(fade_steps - 1, 0, -1):
+            alpha = a / fade_steps
+            beta = ( 1.0 - alpha )     
+            cv2.addWeighted(image1, alpha,
+                            image2, beta,
+                            0.0, blend_img)
+            cv2.imshow("window", blend_img)
+            cv2.waitKey(time_per_fade_step)
+            
+        image1 = image2
+        cv2.imshow("window", image1)
+        i += 1
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
