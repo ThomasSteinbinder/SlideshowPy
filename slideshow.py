@@ -10,11 +10,6 @@ import glob
 import cv2
 import numpy as np
 
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-sWidth = screensize[0]
-sHeight = screensize[1]
-
 def resizeImage(img):
     widthFactor = sWidth / img.shape[1]
     heightFactor = sHeight / img.shape[0]
@@ -34,6 +29,7 @@ def frameImage(img):
 
 cv2.namedWindow('window', cv2.WINDOW_NORMAL)
 cv2.setWindowProperty('window', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+x, y, sWidth, sHeight = cv2.getWindowImageRect('window')
 #images = glob.glob("D:\\testImg\\2\\*.jpg")
 images = glob.glob("C:\\Users\\Thomas\\Desktop\\photoframe\\*.jpg")
 
