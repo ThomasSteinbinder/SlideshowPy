@@ -6,10 +6,11 @@
 # -----------------------------------------------------------
 
 import glob
+from os.path import join
 import cv2
 import numpy as np
 
-
+# Resizes an image to fit in the screen resolution
 def resize_image(img):
     width_factor = screen_width / img.shape[1]
     height_factor = screen_height / img.shape[0]
@@ -22,7 +23,8 @@ def resize_image(img):
                          fy=resize_factor)                         
     return new_img
 
-
+# Generates an image of the size of the screen
+# and places a given image centered inside it.
 def frame_image(img):
     new_img = np.zeros((screen_height, screen_width, 3), np.uint8)
     x_offset = int((new_img.shape[1] - img.shape[1]) / 2)
@@ -32,8 +34,11 @@ def frame_image(img):
     return new_img
 
 
-images = glob.glob("D:\\testImg\\2\\*.jpg")
-#images = glob.glob("C:\\Users\\Thomas\\Desktop\\photoframe\\*.jpg")
+#image_path = "C:\\Users\\Thomas\\Desktop\\photoframe\\"
+image_dir = "D:\\testImg\\2\\"
+images = []
+for ext in ('*.jpg', '*.jpeg', '*.bmp', '*.png'):
+    images.extend(glob.glob(join(image_dir, ext)))   
 count = len(images)
 
 if count == 0:
