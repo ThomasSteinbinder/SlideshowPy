@@ -8,6 +8,7 @@
 import sys
 import getopt
 import glob
+import random as rnd
 from os.path import join
 
 import cv2
@@ -73,6 +74,7 @@ def main(argv):
     if count == 0:
         print("No images found in directory: ",image_dir)
         exit()
+    rnd.shuffle(images)
 
     cv2.namedWindow('window', cv2.WINDOW_NORMAL)
     cv2.setWindowProperty('window',
