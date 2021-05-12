@@ -1,5 +1,6 @@
 # SlideshowPy
 Python script to start a slideshow using OpenCV
+Used this for my digital photo frame using a Raspberry Pi: http://blog.trustmycode.net/?p=303
 
 ### Usage in commandline
 
